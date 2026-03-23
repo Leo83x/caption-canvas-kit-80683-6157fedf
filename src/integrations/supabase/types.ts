@@ -14,7 +14,202 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      company_profiles: {
+        Row: {
+          bio: string | null
+          brand_colors: string[] | null
+          category: string | null
+          company_name: string
+          created_at: string
+          default_tone: string | null
+          description: string | null
+          id: string
+          instagram_access_token: string | null
+          instagram_handle: string | null
+          instagram_user_id: string | null
+          keywords: string[] | null
+          logo_url: string | null
+          max_hashtags: number | null
+          target_audience: string | null
+          updated_at: string
+          user_id: string
+          website_url: string | null
+        }
+        Insert: {
+          bio?: string | null
+          brand_colors?: string[] | null
+          category?: string | null
+          company_name: string
+          created_at?: string
+          default_tone?: string | null
+          description?: string | null
+          id?: string
+          instagram_access_token?: string | null
+          instagram_handle?: string | null
+          instagram_user_id?: string | null
+          keywords?: string[] | null
+          logo_url?: string | null
+          max_hashtags?: number | null
+          target_audience?: string | null
+          updated_at?: string
+          user_id: string
+          website_url?: string | null
+        }
+        Update: {
+          bio?: string | null
+          brand_colors?: string[] | null
+          category?: string | null
+          company_name?: string
+          created_at?: string
+          default_tone?: string | null
+          description?: string | null
+          id?: string
+          instagram_access_token?: string | null
+          instagram_handle?: string | null
+          instagram_user_id?: string | null
+          keywords?: string[] | null
+          logo_url?: string | null
+          max_hashtags?: number | null
+          target_audience?: string | null
+          updated_at?: string
+          user_id?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      generated_posts: {
+        Row: {
+          alt_text: string | null
+          caption: string
+          company_profile_id: string | null
+          created_at: string
+          cta: string | null
+          hashtags: string[]
+          id: string
+          image_prompt: string
+          image_url: string | null
+          objective: string
+          post_type: string
+          rationale: string | null
+          requires_review: boolean | null
+          review_reason: string | null
+          status: string | null
+          style: string | null
+          theme: string
+          tone: string | null
+          updated_at: string
+          user_id: string
+          variant: string
+        }
+        Insert: {
+          alt_text?: string | null
+          caption: string
+          company_profile_id?: string | null
+          created_at?: string
+          cta?: string | null
+          hashtags: string[]
+          id?: string
+          image_prompt: string
+          image_url?: string | null
+          objective: string
+          post_type: string
+          rationale?: string | null
+          requires_review?: boolean | null
+          review_reason?: string | null
+          status?: string | null
+          style?: string | null
+          theme: string
+          tone?: string | null
+          updated_at?: string
+          user_id: string
+          variant: string
+        }
+        Update: {
+          alt_text?: string | null
+          caption?: string
+          company_profile_id?: string | null
+          created_at?: string
+          cta?: string | null
+          hashtags?: string[]
+          id?: string
+          image_prompt?: string
+          image_url?: string | null
+          objective?: string
+          post_type?: string
+          rationale?: string | null
+          requires_review?: boolean | null
+          review_reason?: string | null
+          status?: string | null
+          style?: string | null
+          theme?: string
+          tone?: string | null
+          updated_at?: string
+          user_id?: string
+          variant?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_posts_company_profile_id_fkey"
+            columns: ["company_profile_id"]
+            isOneToOne: false
+            referencedRelation: "company_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scheduled_posts: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          generated_post_id: string | null
+          id: string
+          instagram_media_id: string | null
+          published_at: string | null
+          scheduled_date: string
+          scheduled_time: string
+          status: string | null
+          timezone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          generated_post_id?: string | null
+          id?: string
+          instagram_media_id?: string | null
+          published_at?: string | null
+          scheduled_date: string
+          scheduled_time: string
+          status?: string | null
+          timezone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          generated_post_id?: string | null
+          id?: string
+          instagram_media_id?: string | null
+          published_at?: string | null
+          scheduled_date?: string
+          scheduled_time?: string
+          status?: string | null
+          timezone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_posts_generated_post_id_fkey"
+            columns: ["generated_post_id"]
+            isOneToOne: false
+            referencedRelation: "generated_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
