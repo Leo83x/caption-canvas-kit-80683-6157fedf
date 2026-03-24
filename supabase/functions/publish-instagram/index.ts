@@ -4,6 +4,7 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
 };
 
 interface PublishRequest {
@@ -88,42 +89,61 @@ Deno.serve(async (req) => {
     });
 
     // Step 1: Create media container
-    const mediaUrl = `https://graph.facebook.com/v18.0/${instagram_user_id}/media`;
-    
+    const version = "v20.0";
+    const mediaUrl = `https://graph.facebook.com/${version}/${instagram_user_id}/media`;
+
     const mediaParams = new URLSearchParams({
       image_url: post.image_url || "",
       caption: `${post.caption}\n\n${post.hashtags.join(" ")}`,
       access_token: instagram_access_token,
     });
 
-    console.log("Creating media container...");
+    console.log(`Creating media container using ${version}...`);
+
+    // Diagnostic: Check if image is reachable
+    try {
+      const imgCheck = await fetch(post.image_url, { method: 'HEAD' });
+      console.log("Image accessibility check:", imgCheck.status, imgCheck.ok);
+    } catch (e) {
+      console.warn("Could not verify image accessibility via HEAD request:", e.message);
+    }
+
     const mediaResponse = await fetch(`${mediaUrl}?${mediaParams.toString()}`, {
       method: "POST",
     });
 
-    if (!mediaResponse.ok) {
-      const errorData = await mediaResponse.text();
-      console.error("Media creation error:", errorData);
-      
-      // Mensagens de erro mais claras
-      if (errorData.includes("Invalid OAuth access token")) {
-        throw new Error("Access Token inválido ou expirado. Por favor, gere um novo token no Meta for Developers e atualize em Configurações → Instagram.");
-      }
-      if (errorData.includes("permissions")) {
-        throw new Error("Permissões insuficientes. Certifique-se que o token tem as permissões: instagram_basic, instagram_content_publish");
-      }
-      
-      throw new Error(`Erro ao criar mídia no Instagram: ${errorData}`);
+    const mediaResponseText = await mediaResponse.text();
+    let mediaResponseData;
+    try {
+      mediaResponseData = JSON.parse(mediaResponseText);
+    } catch (e) {
+      console.error("Failed to parse media response as JSON:", mediaResponseText);
     }
 
-    const mediaData = await mediaResponse.json();
-    const creationId = mediaData.id;
+    if (!mediaResponse.ok) {
+      const errorDetail = mediaResponseData?.error?.message || mediaResponseText;
+      console.error("Media creation error:", errorDetail);
+
+      if (errorDetail.includes("Invalid OAuth access token")) {
+        throw new Error("Access Token invalid or expired. Please reconnect your account in Settings → Instagram.");
+      }
+      if (errorDetail.includes("permissions") || errorDetail.includes("Insufficient permission")) {
+        throw new Error("Insufficient permissions. Ensure your token has: instagram_basic, instagram_content_publish");
+      }
+      if (errorDetail.includes("The image could not be downloaded")) {
+        throw new Error("Instagram could not download the image. Ensure the image URL is public.");
+      }
+
+      throw new Error(`Error creating media on Instagram: ${errorDetail}`);
+    }
+
+    const creationId = mediaResponseData.id;
 
     console.log("Media container created:", creationId);
 
     // Step 2: Publish the media
-    const publishUrl = `https://graph.facebook.com/v18.0/${instagram_user_id}/media_publish`;
-    
+    const publishUrl = `https://graph.facebook.com/${version}/${instagram_user_id}/media_publish`;
+
     const publishParams = new URLSearchParams({
       creation_id: creationId,
       access_token: instagram_access_token,
@@ -134,14 +154,21 @@ Deno.serve(async (req) => {
       method: "POST",
     });
 
-    if (!publishResponse.ok) {
-      const errorData = await publishResponse.text();
-      console.error("Publish error:", errorData);
-      throw new Error(`Erro ao publicar: ${errorData}`);
+    const publishResponseText = await publishResponse.text();
+    let publishResponseData;
+    try {
+      publishResponseData = JSON.parse(publishResponseText);
+    } catch (e) {
+      console.error("Failed to parse publish response as JSON:", publishResponseText);
     }
 
-    const publishData = await publishResponse.json();
-    const mediaId = publishData.id;
+    if (!publishResponse.ok) {
+      const errorDetail = publishResponseData?.error?.message || publishResponseText;
+      console.error("Publish error:", errorDetail);
+      throw new Error(`Error publishing: ${errorDetail}`);
+    }
+
+    const mediaId = publishResponseData.id;
 
     console.log("Media published successfully:", mediaId);
 
@@ -171,7 +198,7 @@ Deno.serve(async (req) => {
     );
   } catch (error: any) {
     console.error("Error publishing to Instagram:", error);
-    
+
     return new Response(
       JSON.stringify({
         success: false,

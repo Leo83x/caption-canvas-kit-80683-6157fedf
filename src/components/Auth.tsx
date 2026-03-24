@@ -1,194 +1,164 @@
+
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Instagram, Sparkles } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
+import { Loader2, Instagram, Sparkles } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function Auth() {
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
+  const handleAuth = async (isSignUp: boolean) => {
+    setLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: name,
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: name,
+            },
           },
-        },
-      });
-
-      if (error) throw error;
-
-      toast.success("Conta criada com sucesso! Você já está conectado.");
+        });
+        if (error) throw error;
+        toast.success("Account created successfully! You can now log in.");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+        toast.success("Login successful!");
+        navigate('/dashboard');
+      }
     } catch (error: any) {
-      toast.error(error.message || "Erro ao criar conta");
+      console.error("Auth error:", error);
+      toast.error(error.message || "Authentication failed");
     } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      toast.success("Login realizado com sucesso!");
-    } catch (error: any) {
-      toast.error(error.message || "Erro ao fazer login");
-    } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 gradient-subtle">
-      <Card className="w-full max-w-md p-8 shadow-lg">
-        <div className="flex justify-center mb-6">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl gradient-instagram shadow-glow">
-            <Instagram className="h-8 w-8 text-white" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-subtle p-4 w-full">
+      <Card className="w-full max-w-md p-8 shadow-smooth bg-white/80 backdrop-blur">
+        <div className="flex flex-col items-center mb-8">
+          <div className="h-20 w-20 rounded-2xl overflow-hidden shadow-xl mb-4 border-2 border-white">
+            <img src="/logo.png" alt="Studio Genius" className="h-full w-full object-cover" />
           </div>
-        </div>
-
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-display font-bold mb-2">InstaGenius</h1>
-          <p className="text-muted-foreground">
-            Transforme ideias em posts profissionais com IA
+          <h1 className="text-3xl font-display font-bold text-gray-900 text-center">Studio Genius</h1>
+          <p className="text-muted-foreground mt-2 text-center">
+            Transform ideas into professional AI content
           </p>
         </div>
 
-        <Tabs defaultValue="signin" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signin">Entrar</TabsTrigger>
-            <TabsTrigger value="signup">Criar Conta</TabsTrigger>
+        <Tabs defaultValue="login" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsTrigger value="login">Login</TabsTrigger>
+            <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="signin" className="space-y-4">
-            <form onSubmit={handleSignIn} className="space-y-4">
-              <div>
-                <Label htmlFor="signin-email">Email</Label>
+          <TabsContent value="login">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  id="signin-email"
+                  id="email"
                   type="email"
-                  placeholder="seu@email.com"
+                  placeholder="your@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
+                  disabled={loading}
                 />
               </div>
-              <div>
-                <Label htmlFor="signin-password">Senha</Label>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
                 <Input
-                  id="signin-password"
+                  id="password"
                   type="password"
-                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
+                  disabled={loading}
                 />
               </div>
-              <Button 
-                type="submit" 
-                variant="gradient" 
-                className="w-full"
-                disabled={isLoading}
+              <Button
+                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transition-all"
+                onClick={() => handleAuth(false)}
+                disabled={loading}
               >
-                {isLoading ? (
-                  <>
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
-                    Entrando...
-                  </>
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : (
-                  <>
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Entrar
-                  </>
+                  <Sparkles className="h-4 w-4 mr-2" />
                 )}
+                Login
               </Button>
-            </form>
+            </div>
           </TabsContent>
 
-          <TabsContent value="signup" className="space-y-4">
-            <form onSubmit={handleSignUp} className="space-y-4">
-              <div>
-                <Label htmlFor="signup-name">Nome</Label>
+          <TabsContent value="signup">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="signup-name">Name</Label>
                 <Input
                   id="signup-name"
                   type="text"
-                  placeholder="Seu nome"
+                  placeholder="Your Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  required
+                  disabled={loading}
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="signup-email">Email</Label>
                 <Input
                   id="signup-email"
                   type="email"
-                  placeholder="seu@email.com"
+                  placeholder="your@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
+                  disabled={loading}
                 />
               </div>
-              <div>
-                <Label htmlFor="signup-password">Senha</Label>
+              <div className="space-y-2">
+                <Label htmlFor="signup-password">Password</Label>
                 <Input
                   id="signup-password"
                   type="password"
-                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
+                  disabled={loading}
                 />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Mínimo de 6 caracteres
-                </p>
               </div>
-              <Button 
-                type="submit" 
-                variant="gradient" 
+              <Button
                 className="w-full"
-                disabled={isLoading}
+                variant="outline"
+                onClick={() => handleAuth(true)}
+                disabled={loading}
               >
-                {isLoading ? (
-                  <>
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
-                    Criando conta...
-                  </>
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : (
-                  <>
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Criar Conta
-                  </>
+                  <Sparkles className="h-4 w-4 mr-2" />
                 )}
+                Create Account
               </Button>
-            </form>
+            </div>
           </TabsContent>
         </Tabs>
 
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          Ao criar uma conta, você concorda com nossos termos e políticas
+        <p className="text-xs text-center text-muted-foreground mt-8">
+          By creating an account, you agree to our terms and policies
         </p>
       </Card>
     </div>
