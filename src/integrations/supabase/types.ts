@@ -16,6 +16,9 @@ export type Database = {
     Tables: {
       company_profiles: {
         Row: {
+          ai_credits_last_reset: string | null
+          ai_credits_remaining: number | null
+          ai_credits_total: number | null
           bio: string | null
           brand_colors: string[] | null
           category: string | null
@@ -31,11 +34,15 @@ export type Database = {
           logo_url: string | null
           max_hashtags: number | null
           target_audience: string | null
+          token_expires_at: string | null
           updated_at: string
           user_id: string
           website_url: string | null
         }
         Insert: {
+          ai_credits_last_reset?: string | null
+          ai_credits_remaining?: number | null
+          ai_credits_total?: number | null
           bio?: string | null
           brand_colors?: string[] | null
           category?: string | null
@@ -51,11 +58,15 @@ export type Database = {
           logo_url?: string | null
           max_hashtags?: number | null
           target_audience?: string | null
+          token_expires_at?: string | null
           updated_at?: string
           user_id: string
           website_url?: string | null
         }
         Update: {
+          ai_credits_last_reset?: string | null
+          ai_credits_remaining?: number | null
+          ai_credits_total?: number | null
           bio?: string | null
           brand_colors?: string[] | null
           category?: string | null
@@ -71,6 +82,7 @@ export type Database = {
           logo_url?: string | null
           max_hashtags?: number | null
           target_audience?: string | null
+          token_expires_at?: string | null
           updated_at?: string
           user_id?: string
           website_url?: string | null
@@ -157,6 +169,107 @@ export type Database = {
           },
         ]
       }
+      hashtag_trends: {
+        Row: {
+          category: string | null
+          created_at: string
+          hashtag: string
+          id: string
+          trending_score: number | null
+          user_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          hashtag: string
+          id?: string
+          trending_score?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          hashtag?: string
+          id?: string
+          trending_score?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      image_library: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          storage_path: string
+          tags: string[] | null
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          storage_path: string
+          tags?: string[] | null
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          storage_path?: string
+          tags?: string[] | null
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      post_analytics: {
+        Row: {
+          comments_count: number | null
+          created_at: string
+          generated_post_id: string | null
+          id: string
+          impressions: number | null
+          likes_count: number | null
+          reach: number | null
+          saves: number | null
+          shares: number | null
+        }
+        Insert: {
+          comments_count?: number | null
+          created_at?: string
+          generated_post_id?: string | null
+          id?: string
+          impressions?: number | null
+          likes_count?: number | null
+          reach?: number | null
+          saves?: number | null
+          shares?: number | null
+        }
+        Update: {
+          comments_count?: number | null
+          created_at?: string
+          generated_post_id?: string | null
+          id?: string
+          impressions?: number | null
+          likes_count?: number | null
+          reach?: number | null
+          saves?: number | null
+          shares?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_analytics_generated_post_id_fkey"
+            columns: ["generated_post_id"]
+            isOneToOne: false
+            referencedRelation: "generated_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scheduled_posts: {
         Row: {
           created_at: string
@@ -210,12 +323,78 @@ export type Database = {
           },
         ]
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          plan_type: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_type?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_type?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      theme_suggestions: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          theme_name: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          theme_name: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          theme_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      approve_post: {
+        Args: { p_comment?: string; p_new_status: string; p_post_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
