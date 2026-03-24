@@ -59,8 +59,8 @@ export default function Analytics() {
         if (analytics) {
           post.hashtags.forEach((tag: string) => {
             const current = hashtagMap.get(tag) || { hashtag: tag, engagement: 0, reach: 0, count: 0 };
-            current.engagement += analytics.likes_count + analytics.comments_count;
-            current.reach += analytics.reach || 0;
+            current.engagement += (analytics as any).likes_count + (analytics as any).comments_count;
+            current.reach += (analytics as any).reach || 0;
             current.count += 1;
             hashtagMap.set(tag, current);
           });
@@ -196,12 +196,12 @@ export default function Analytics() {
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
                               <div className="flex items-center gap-2 text-sm bg-muted/20 px-2 py-1 rounded">
                                 <Heart className="h-4 w-4 text-pink-500" />
-                                <span className="font-bold">{analytics.likes_count}</span>
+                                <span className="font-bold">{(analytics as any).likes_count}</span>
                                 <span className="text-muted-foreground hidden md:inline ml-1 uppercase text-[10px] font-bold">Curtidas</span>
                               </div>
                               <div className="flex items-center gap-2 text-sm bg-muted/20 px-2 py-1 rounded">
                                 <MessageCircle className="h-4 w-4 text-blue-500" />
-                                <span className="font-bold">{analytics.comments_count}</span>
+                                <span className="font-bold">{(analytics as any).comments_count}</span>
                                 <span className="text-muted-foreground hidden md:inline ml-1 uppercase text-[10px] font-bold">Comentários</span>
                               </div>
                               <div className="flex items-center gap-2 text-sm bg-muted/20 px-2 py-1 rounded">
@@ -211,7 +211,7 @@ export default function Analytics() {
                               </div>
                               <div className="flex items-center gap-2 text-sm bg-muted/20 px-2 py-1 rounded">
                                 <Eye className="h-4 w-4 text-purple-500" />
-                                <span className="font-bold">{analytics.reach}</span>
+                                <span className="font-bold">{(analytics as any).reach}</span>
                                 <span className="text-muted-foreground hidden md:inline ml-1 uppercase text-[10px] font-bold">Alcance</span>
                               </div>
                               <div className="flex items-center gap-2 text-sm bg-muted/20 px-2 py-1 rounded">

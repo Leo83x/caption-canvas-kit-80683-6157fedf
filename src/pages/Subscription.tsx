@@ -114,7 +114,7 @@ export default function Subscription() {
             ai_credits_total: planConfig.total,
             ai_credits_remaining: planConfig.remaining,
             ai_credits_last_reset: new Date().toISOString()
-          })
+          } as any)
           .eq("user_id", user.id);
       }
 

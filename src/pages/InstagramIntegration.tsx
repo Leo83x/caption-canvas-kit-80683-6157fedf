@@ -4,7 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Instagram, CheckCircle2, XCircle, AlertCircle, RefreshCw, ArrowLeft, ShieldCheck } from "lucide-react";
+import { Instagram, CheckCircle2, XCircle, AlertCircle, RefreshCw, ArrowLeft, ShieldCheck, Sparkles } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -100,14 +101,14 @@ export default function InstagramIntegration() {
 
       if (error) throw error;
 
-      if (data?.instagram_access_token && data?.instagram_user_id) {
+      if ((data as any)?.instagram_access_token && (data as any)?.instagram_user_id) {
         setIsConnected(true);
-        setInstagramUserId(data.instagram_user_id);
-        setTokenExpiresAt(data.token_expires_at);
+        setInstagramUserId((data as any).instagram_user_id);
+        setTokenExpiresAt((data as any).token_expires_at);
 
         try {
           const response = await fetch(
-            `https://graph.facebook.com/v20.0/${data.instagram_user_id}?fields=username&access_token=${data.instagram_access_token}`
+            `https://graph.facebook.com/v20.0/${(data as any).instagram_user_id}?fields=username&access_token=${(data as any).instagram_access_token}`
           );
           const userData = await response.json();
           if (userData.username) {

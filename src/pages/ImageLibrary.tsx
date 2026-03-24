@@ -40,7 +40,7 @@ export default function ImageLibrary() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setImages(data || []);
+      setImages((data as any) || []);
     } catch (error) {
       console.error("Error loading images:", error);
       toast.error("Error loading images");

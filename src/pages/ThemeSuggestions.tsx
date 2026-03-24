@@ -62,7 +62,7 @@ export default function ThemeSuggestions() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setSavedThemes(data || []);
+      setSavedThemes((data as any) || []);
     } catch (error) {
       console.error("Error loading themes:", error);
     }
@@ -102,7 +102,7 @@ export default function ThemeSuggestions() {
 
       const { error } = await supabase
         .from("theme_suggestions" as any)
-        .insert([{ ...theme, user_id: user.id }]);
+        .insert([{ ...theme, user_id: user.id }] as any);
 
       if (error) throw error;
 

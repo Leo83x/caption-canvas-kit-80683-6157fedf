@@ -39,9 +39,9 @@ export default function HashtagExplorer() {
 
     if (!error && data) {
       setHashtags(data.map(h => ({
-        tag: h.hashtag,
-        category: h.category || 'General',
-        score: h.trending_score || 0,
+        tag: (h as any).hashtag,
+        category: (h as any).category || 'General',
+        score: (h as any).trending_score || 0,
         estimatedReach: 0,
       })));
     }
@@ -50,7 +50,7 @@ export default function HashtagExplorer() {
   const filteredHashtags = searchTerm
     ? hashtags.filter(h =>
       h.tag.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      h.category.toLowerCase().includes(searchTerm.toLowerCase())
+      (h as any).category.toLowerCase().includes(searchTerm.toLowerCase())
     )
     : hashtags;
 

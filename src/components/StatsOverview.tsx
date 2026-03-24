@@ -45,8 +45,8 @@ export function StatsOverview() {
       setStats({
         postsGerados: postsCount || 0,
         postsAgendados: scheduledCount || 0,
-        aiCredits: profile?.ai_credits_remaining ?? 0,
-        aiCreditsTotal: profile?.ai_credits_total ?? 100,
+        aiCredits: (profile as any)?.ai_credits_remaining ?? 0,
+        aiCreditsTotal: (profile as any)?.ai_credits_total ?? 100,
       });
     } catch (error) {
       console.error("Error loading stats:", error);
