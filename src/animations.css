@@ -1,0 +1,173 @@
+/* Page transition animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+/* Animation classes */
+.animate-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.slide-in-from-bottom-4 {
+    animation: slideInFromBottom 0.5s ease-out;
+}
+
+.slide-in-from-right {
+    animation: slideInFromRight 0.5s ease-out;
+}
+
+.scale-in {
+    animation: scaleIn 0.3s ease-out;
+}
+
+/* Skeleton shimmer effect */
+.skeleton-shimmer {
+    background: linear-gradient(90deg,
+            hsl(var(--muted)) 0%,
+            hsl(var(--muted-foreground) / 0.1) 50%,
+            hsl(var(--muted)) 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+}
+
+/* Smooth hover effects */
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px hsl(var(--primary) / 0.15);
+}
+
+/* Pulse animation for loading states */
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.pulse-glow {
+    animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Stagger children animations */
+.stagger-children>* {
+    animation: slideInFromBottom 0.5s ease-out;
+}
+
+.stagger-children>*:nth-child(1) {
+    animation-delay: 0ms;
+}
+
+.stagger-children>*:nth-child(2) {
+    animation-delay: 100ms;
+}
+
+.stagger-children>*:nth-child(3) {
+    animation-delay: 200ms;
+}
+
+.stagger-children>*:nth-child(4) {
+    animation-delay: 300ms;
+}
+
+.stagger-children>*:nth-child(5) {
+    animation-delay: 400ms;
+}
+
+/* Smooth page transitions */
+.page-transition {
+    animation: fadeIn 0.3s ease-out, slideInFromBottom 0.3s ease-out;
+}
+
+/* Button press effect */
+.button-press {
+    transition: transform 0.1s ease;
+}
+
+.button-press:active {
+    transform: scale(0.95);
+}
+
+/* Gradient animation */
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+}
