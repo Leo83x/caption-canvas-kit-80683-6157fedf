@@ -1,9 +1,4 @@
-/**
- * Serviço de Analytics
- * Integração com Instagram Insights API
- */
-
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from "@/integrations/supabase/client";
 
 export interface EngagementMetrics {
     likes: number;
@@ -18,30 +13,28 @@ export interface EngagementMetrics {
 export interface PostPerformance {
     postId: string;
     caption: string;
-    imageUrl?: string;
-    publishedAt: string;
+    imageUrl: string | null;
+    createdAt: string;
     metrics: EngagementMetrics;
 }
 
 export interface AnalyticsSummary {
     totalPosts: number;
-    totalEngagement: number;
+    totalLikes: number;
+    totalComments: number;
+    totalShares: number;
+    totalSaves: number;
+    totalReach: number;
+    totalImpressions: number;
     averageEngagementRate: number;
-    topPost: PostPerformance | null;
-    recentPosts: PostPerformance[];
-    growthRate: number;
+    topPosts: PostPerformance[];
+    dailyMetrics: { date: string; engagement: number; reach: number }[];
 }
 
-/**
- * Calcula taxa de engajamento
- */
-export function calculateEngagementRate(metrics: Partial<EngagementMetrics>): number {
-    const { likes = 0, comments = 0, shares = 0, saves = 0, reach = 0 } = metrics;
-
-    if (reach === 0) return 0;
-
-    const totalEngagement = likes + comments + (shares * 2) + (saves * 3);
-    return (totalEngagement / reach) * 100;
+function calculateEngagementRate(data: any): number {
+    const interactions = (data?.likes_count || data?.likes || 0) + (data?.comments_count || data?.comments || 0) + (data?.shares || 0) + (data?.saves || 0);
+    const reach = data?.reach || 1;
+    return Number(((interactions / reach) * 100).toFixed(2));
 }
 
 /**
@@ -52,19 +45,20 @@ export async function getPostMetrics(postId: string): Promise<EngagementMetrics 
         const { data, error } = await supabase
             .from('post_analytics')
             .select('*')
-            .eq('post_id', postId)
+            .eq('generated_post_id', postId)
             .single();
 
         if (error) throw error;
 
+        const d = data as any;
         return {
-            likes: data.likes || 0,
-            comments: data.comments || 0,
-            shares: data.shares || 0,
-            saves: data.saves || 0,
-            reach: data.reach || 0,
-            impressions: data.impressions || 0,
-            engagementRate: calculateEngagementRate(data),
+            likes: d.likes_count || 0,
+            comments: d.comments_count || 0,
+            shares: d.shares || 0,
+            saves: d.saves || 0,
+            reach: d.reach || 0,
+            impressions: d.impressions || 0,
+            engagementRate: calculateEngagementRate(d),
         };
     } catch (error) {
         console.error('Error fetching post metrics:', error);
@@ -88,27 +82,27 @@ export async function getAnalyticsSummary(userId: string, days: number = 30): Pr
         image_url,
         created_at,
         post_analytics (
-          likes,
-          comments,
+          likes_count,
+          comments_count,
           shares,
           saves,
           reach,
           impressions
         )
-      `)
+      ` as any)
             .eq('user_id', userId)
             .gte('created_at', startDate.toISOString())
             .order('created_at', { ascending: false });
 
         if (error) throw error;
 
-        const postsWithMetrics: PostPerformance[] = posts
+        const postsWithMetrics: PostPerformance[] = (posts as any[])
             .filter(post => post.post_analytics && post.post_analytics.length > 0)
             .map(post => {
                 const analytics = post.post_analytics[0];
                 const metrics: EngagementMetrics = {
-                    likes: analytics.likes || 0,
-                    comments: analytics.comments || 0,
+                    likes: analytics.likes_count || 0,
+                    comments: analytics.comments_count || 0,
                     shares: analytics.shares || 0,
                     saves: analytics.saves || 0,
                     reach: analytics.reach || 0,
@@ -118,58 +112,44 @@ export async function getAnalyticsSummary(userId: string, days: number = 30): Pr
 
                 return {
                     postId: post.id,
-                    caption: post.caption || '',
+                    caption: post.caption,
                     imageUrl: post.image_url,
-                    publishedAt: post.created_at,
+                    createdAt: post.created_at,
                     metrics,
                 };
             });
 
-        const totalEngagement = postsWithMetrics.reduce(
-            (sum, post) => sum + (post.metrics.likes + post.metrics.comments + post.metrics.shares + post.metrics.saves),
-            0
+        const totals = postsWithMetrics.reduce(
+            (acc, post) => ({
+                likes: acc.likes + post.metrics.likes,
+                comments: acc.comments + post.metrics.comments,
+                shares: acc.shares + post.metrics.shares,
+                saves: acc.saves + post.metrics.saves,
+                reach: acc.reach + post.metrics.reach,
+                impressions: acc.impressions + post.metrics.impressions,
+            }),
+            { likes: 0, comments: 0, shares: 0, saves: 0, reach: 0, impressions: 0 }
         );
 
-        const averageEngagementRate = postsWithMetrics.length > 0
-            ? postsWithMetrics.reduce((sum, post) => sum + post.metrics.engagementRate, 0) / postsWithMetrics.length
-            : 0;
-
-        const topPost = postsWithMetrics.length > 0
-            ? postsWithMetrics.reduce((top, post) =>
-                post.metrics.engagementRate > top.metrics.engagementRate ? post : top
-            )
-            : null;
+        const avgEngagement =
+            postsWithMetrics.length > 0
+                ? postsWithMetrics.reduce((sum, p) => sum + p.metrics.engagementRate, 0) / postsWithMetrics.length
+                : 0;
 
         return {
             totalPosts: postsWithMetrics.length,
-            totalEngagement,
-            averageEngagementRate,
-            topPost,
-            recentPosts: postsWithMetrics.slice(0, 10),
-            growthRate: 0, // TODO: Calcular baseado em dados históricos
+            totalLikes: totals.likes,
+            totalComments: totals.comments,
+            totalShares: totals.shares,
+            totalSaves: totals.saves,
+            totalReach: totals.reach,
+            totalImpressions: totals.impressions,
+            averageEngagementRate: Number(avgEngagement.toFixed(2)),
+            topPosts: postsWithMetrics.slice(0, 5),
+            dailyMetrics: [],
         };
     } catch (error) {
         console.error('Error fetching analytics summary:', error);
         return null;
     }
-}
-
-/**
- * Formata número para exibição (1.2K, 1.5M, etc)
- */
-export function formatNumber(num: number): string {
-    if (num >= 1000000) {
-        return (num / 1000000).toFixed(1) + 'M';
-    }
-    if (num >= 1000) {
-        return (num / 1000).toFixed(1) + 'K';
-    }
-    return num.toString();
-}
-
-/**
- * Formata porcentagem
- */
-export function formatPercentage(num: number): string {
-    return num.toFixed(2) + '%';
 }

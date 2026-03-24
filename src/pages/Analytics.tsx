@@ -54,7 +54,7 @@ export default function Analytics() {
         .not("post_analytics", "is", null);
 
       const hashtagMap = new Map();
-      data?.forEach((post) => {
+      (data as any)?.forEach((post: any) => {
         const analytics = post.post_analytics?.[0];
         if (analytics) {
           post.hashtags.forEach((tag: string) => {
