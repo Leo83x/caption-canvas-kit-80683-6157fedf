@@ -38,7 +38,7 @@ export function StatsOverview() {
       // 3. Get AI credits from profile
       const { data: profile } = await supabase
         .from("company_profiles")
-        .select("ai_credits_remaining, ai_credits_total")
+        .select("ai_credits_remaining, ai_credits_total" as any)
         .eq("user_id", user.id)
         .maybeSingle();
 

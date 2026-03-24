@@ -64,7 +64,7 @@ export default function PublicApproval() {
           payload.p_comment = comment;
       }
 
-      const { error } = await supabase.rpc('approve_post', payload);
+      const { error } = await supabase.rpc('approve_post' as any, payload);
         
       if (error) throw error;
       setStatus(action);

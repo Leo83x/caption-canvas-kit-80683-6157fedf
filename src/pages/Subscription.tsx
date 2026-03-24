@@ -40,14 +40,14 @@ export default function Subscription() {
       setProfile(profileData);
 
       let { data: subData } = await supabase
-        .from("subscriptions")
+        .from("subscriptions" as any)
         .select("*")
         .eq("user_id", user.id)
         .maybeSingle();
 
       if (!subData) {
         const { data: newSub, error } = await supabase
-          .from("subscriptions")
+          .from("subscriptions" as any)
           .insert([{
             user_id: user.id,
             plan_type: 'free',
@@ -97,7 +97,7 @@ export default function Subscription() {
 
       // Update subscription
       await supabase
-        .from("subscriptions")
+        .from("subscriptions" as any)
         .update({
           plan_type: planType,
           current_period_start: new Date().toISOString(),

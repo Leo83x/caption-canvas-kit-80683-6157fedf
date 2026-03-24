@@ -94,7 +94,7 @@ export default function InstagramIntegration() {
 
       const { data, error } = await supabase
         .from("company_profiles")
-        .select("instagram_access_token, instagram_user_id, token_expires_at")
+        .select("instagram_access_token, instagram_user_id, token_expires_at" as any)
         .eq("user_id", user.id)
         .maybeSingle();
 

@@ -49,7 +49,7 @@ export default function Analytics() {
 
       const { data } = await supabase
         .from("generated_posts")
-        .select("hashtags, post_analytics(*)")
+        .select("hashtags, post_analytics(*)" as any)
         .eq("user_id", user.id)
         .not("post_analytics", "is", null);
 

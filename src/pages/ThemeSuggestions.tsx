@@ -55,7 +55,7 @@ export default function ThemeSuggestions() {
       if (!user) return;
 
       const { data, error } = await supabase
-        .from("theme_suggestions")
+        .from("theme_suggestions" as any)
         .select("*")
         .eq("user_id", user.id)
         .eq("is_active", true)
@@ -101,7 +101,7 @@ export default function ThemeSuggestions() {
       if (!user) return;
 
       const { error } = await supabase
-        .from("theme_suggestions")
+        .from("theme_suggestions" as any)
         .insert([{ ...theme, user_id: user.id }]);
 
       if (error) throw error;

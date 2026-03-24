@@ -95,7 +95,7 @@ export const PostCreator = ({ onPostGenerated, onGeneratingChange, initialTopic 
       }
 
       const { data: libData } = await supabase
-        .from("image_library")
+        .from("image_library" as any)
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });

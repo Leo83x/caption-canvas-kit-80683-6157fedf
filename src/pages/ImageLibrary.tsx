@@ -34,7 +34,7 @@ export default function ImageLibrary() {
       if (!user) return;
 
       const { data, error } = await supabase
-        .from("image_library")
+        .from("image_library" as any)
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
@@ -77,7 +77,7 @@ export default function ImageLibrary() {
         .getPublicUrl(fileName);
 
       const { error: insertError } = await supabase
-        .from("image_library")
+        .from("image_library" as any)
         .insert({
           user_id: user.id,
           storage_path: fileName,
@@ -107,7 +107,7 @@ export default function ImageLibrary() {
       if (storageError) throw storageError;
 
       const { error: dbError } = await supabase
-        .from("image_library")
+        .from("image_library" as any)
         .delete()
         .eq("id", imageId);
 
@@ -128,7 +128,7 @@ export default function ImageLibrary() {
     try {
       const newTags = [...currentTags, tag.toLowerCase()];
       const { error } = await supabase
-        .from("image_library")
+        .from("image_library" as any)
         .update({ tags: newTags })
         .eq("id", imageId);
 

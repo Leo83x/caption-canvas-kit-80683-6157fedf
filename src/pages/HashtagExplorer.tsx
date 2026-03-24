@@ -32,7 +32,7 @@ export default function HashtagExplorer() {
 
   const loadSavedHashtags = async () => {
     const { data, error } = await supabase
-      .from('hashtag_trends')
+      .from('hashtag_trends' as any)
       .select('*')
       .order('trending_score', { ascending: false })
       .limit(20);

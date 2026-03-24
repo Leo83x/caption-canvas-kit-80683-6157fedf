@@ -182,7 +182,7 @@ const EditorContent = ({ imageUrl: initialImageUrl, initialText, onSave, onClose
   const loadLibrary = async () => {
     setLoadingLibrary(true);
     try {
-      const { data, error } = await supabase.from("image_library").select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("image_library" as any).select("*").order("created_at", { ascending: false });
       if (error) throw error;
       setLibraryImages(data || []);
     } catch (error) {
