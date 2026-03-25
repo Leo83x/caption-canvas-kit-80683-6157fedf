@@ -3,165 +3,98 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
 };
 
+const AI_GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Missing authorization header' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    // Get JWT token from auth header
+    const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
     const token = authHeader.replace('Bearer ', '');
     const { data: { user } } = await supabase.auth.getUser(token);
-
     if (!user) {
       return new Response(JSON.stringify({ error: 'User not authenticated' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     const { keywords, industry } = await req.json();
+    const { data: profile } = await supabase.from('company_profiles').select('*').eq('user_id', user.id).single();
 
-    console.log('Searching hashtags for:', { keywords, industry, userId: user.id });
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Get company profile to understand the business
-    const { data: profile } = await supabase
-      .from('company_profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
-
-    // Groq API Key
-    const OPENROUTER_API_KEY = Deno.env.get('OPENROUTER_API_KEY');
-
-    // Use AI to suggest relevant hashtags based on the business profile
-    const systemPrompt = `Você é um especialista em marketing digital e Instagram Business.
-Sua função é sugerir hashtags ESTRATÉGICAS e RELEVANTES para empresas no Instagram.
-
-REGRAS:
-1. Sugira EXATAMENTE 20 hashtags divididas em 3 categorias:
-   - MARCA (2-3): hashtags exclusivas da marca/empresa
-   - NICHO (10-12): hashtags relevantes para o setor, com alcance médio (10k-500k posts)
-   - CAUDA LONGA (5-7): hashtags específicas, menos concorridas (<10k posts)
-
-2. Para cada hashtag, forneça:
-   - tag: a hashtag (com #)
-   - category: "Marca", "Nicho" ou "Cauda Longa"
-   - score: relevância estimada (0-100)
-   - estimatedReach: alcance estimado em posts
-   - description: breve explicação de por que é relevante
-
-3. EVITE hashtags banidas ou spam (#like4like, #follow4follow, etc.)
-
-4. FOQUE em hashtags que o público-alvo realmente busca
-
-RETORNE APENAS UM JSON VÁLIDO NO SEGUINTE FORMATO:
-{
-  "hashtags": [
-    {
-      "tag": "#exemplohashtag",
-      "category": "Nicho",
-      "score": 85,
-      "estimatedReach": 150000,
-      "description": "Popular entre o público-alvo"
-    }
-  ]
-}`;
-
-    const userPrompt = `
-Empresa: ${profile?.company_name || 'empresa'}
-Setor: ${industry || profile?.industry || 'geral'}
-Público-alvo: ${profile?.target_audience || 'geral'}
-Palavras-chave para busca: ${keywords || 'marketing digital'}
-
-Sugira 20 hashtags estratégicas para essa empresa usar no Instagram.
-`;
-
-    console.log('Calling Groq API (Model: llama-3.3-70b-versatile)...');
-
-    const aiResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const response = await fetch(AI_GATEWAY_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENROUTER_API_KEY}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${LOVABLE_API_KEY}` },
       body: JSON.stringify({
-        model: 'meta-llama/llama-3.3-70b-instruct',
+        model: "google/gemini-2.5-flash",
         messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
+          { role: 'system', content: `Você é um especialista em marketing digital e Instagram Business. Sugira 20 hashtags ESTRATÉGICAS divididas em: MARCA (2-3), NICHO (10-12), CAUDA LONGA (5-7). Evite hashtags banidas.` },
+          { role: 'user', content: `Empresa: ${profile?.company_name || 'empresa'}\nSetor: ${industry || 'geral'}\nPúblico: ${profile?.target_audience || 'geral'}\nKeywords: ${keywords || 'marketing digital'}` }
         ],
-        response_format: { type: 'json_object' },
+        tools: [{
+          type: "function",
+          function: {
+            name: "suggest_hashtags",
+            description: "Return strategic hashtag suggestions",
+            parameters: {
+              type: "object",
+              properties: {
+                hashtags: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      tag: { type: "string" }, category: { type: "string" },
+                      score: { type: "number" }, estimatedReach: { type: "number" },
+                      description: { type: "string" }
+                    },
+                    required: ["tag", "category", "score", "estimatedReach", "description"]
+                  }
+                }
+              },
+              required: ["hashtags"]
+            }
+          }
+        }],
+        tool_choice: { type: "function", function: { name: "suggest_hashtags" } },
         temperature: 0.7,
-        max_tokens: 2000,
       }),
     });
 
-    if (!aiResponse.ok) {
-      const errorText = await aiResponse.text();
-      console.error('Groq API error:', aiResponse.status, errorText);
-      throw new Error(`Erro na IA (${aiResponse.status}): ${errorText.substring(0, 100)}`);
+    if (!response.ok) {
+      const errText = await response.text();
+      if (response.status === 429) throw new Error("Rate limit exceeded");
+      if (response.status === 402) throw new Error("AI credits exhausted");
+      throw new Error(`AI error (${response.status})`);
     }
 
-    const aiData = await aiResponse.json();
-    const content = aiData.choices?.[0]?.message?.content;
+    const aiData = await response.json();
+    const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
+    if (!toolCall) throw new Error('No structured output');
+    const result = JSON.parse(toolCall.function.arguments);
 
-    if (!content) {
-      throw new Error('Groq response não contém conteúdo válido');
-    }
-
-    let result;
-    try {
-      // Extrair JSON do markdown se necessário
-      const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/) || content.match(/\{[\s\S]*\}/);
-      const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
-      result = JSON.parse(jsonStr);
-    } catch (e) {
-      console.error('Failed to parse AI response:', e);
-      return new Response(JSON.stringify({
-        error: 'Falha ao processar resposta da IA',
-        details: content
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Save to database for future reference
+    // Save to database
     if (result.hashtags && Array.isArray(result.hashtags)) {
       const hashtagsToSave = result.hashtags.map((h: any) => ({
-        user_id: user.id,
-        hashtag: h.tag,
-        category: h.category,
-        score: h.score,
-        usage_count: 0,
+        user_id: user.id, hashtag: h.tag, category: h.category,
+        trending_score: h.score,
       }));
-
-      // Upsert hashtags (update if exists, insert if not)
-      const { error: insertError } = await supabase
-        .from('hashtag_trends')
-        .upsert(hashtagsToSave, {
-          onConflict: 'user_id,hashtag',
-          ignoreDuplicates: false
-        });
-
-      if (insertError) {
-        console.error('Error saving hashtags:', insertError);
-        // Don't fail the request, just log it
-      }
+      await supabase.from('hashtag_trends').upsert(hashtagsToSave, {
+        onConflict: 'user_id,hashtag', ignoreDuplicates: false
+      });
     }
 
     return new Response(JSON.stringify(result), {
@@ -169,13 +102,9 @@ Sugira 20 hashtags estratégicas para essa empresa usar no Instagram.
     });
 
   } catch (error: any) {
-    console.error('Error in search-hashtags function:', error);
-    return new Response(JSON.stringify({
-      error: error.message || 'Erro ao buscar hashtags',
-      details: error.toString()
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    console.error('Error in search-hashtags:', error);
+    return new Response(JSON.stringify({ error: error.message || 'Erro ao buscar hashtags' }), {
+      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 });
