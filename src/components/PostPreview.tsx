@@ -346,13 +346,13 @@ STRATEGY: ${currentPost.rationale}
         alt_text: currentPost.altText || "",
         rationale: currentPost.rationale || "",
         status: "draft",
-        slides: currentPost.slides || [],
+        slides: (currentPost.slides || []) as any,
         source_url: currentPost.sourceUrl,
         success_score: currentPost.successScore,
         success_analysis: currentPost.successAnalysis,
         headline_text: currentPost.headlineText,
-        video_script: currentPost.videoScript as any || null
-      });
+        video_script: (currentPost.videoScript || null) as any
+      } as any);
       if (error) throw error;
       toast.success("Post salvo com sucesso!");
     } catch (error: any) {

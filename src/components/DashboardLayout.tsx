@@ -111,11 +111,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         )}
       >
         {/* Top Navbar */}
+        {/* Scroll fade overlay - appears when scrolling to mask content behind header */}
+        {isScrolled && (
+          <div className="sticky top-16 z-40 h-8 -mb-8 bg-gradient-to-b from-background/80 to-transparent pointer-events-none" />
+        )}
+
         <header className={cn(
           "sticky top-0 z-50 h-16 flex items-center justify-between px-8 border-b transition-all duration-300",
           isScrolled
-            ? "border-white/10 bg-background/95 backdrop-blur-xl shadow-lg ring-1 ring-white/10" 
-            : "border-transparent bg-transparent backdrop-blur-none"
+            ? "border-white/10 bg-background/95 shadow-lg ring-1 ring-white/10" 
+            : "border-transparent bg-transparent"
         )}>
           <div className="flex items-center gap-4">
             {isMobile && (
