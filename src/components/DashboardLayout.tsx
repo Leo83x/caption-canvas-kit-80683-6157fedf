@@ -106,17 +106,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       <main 
         ref={mainRef}
         className={cn(
-          "flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out",
+          "flex-1 flex flex-col min-w-0 h-screen overflow-hidden transition-all duration-300 ease-in-out",
           !isMobile && (isSidebarCollapsed ? "ml-16" : "ml-64")
         )}
       >
         {/* Top Navbar */}
-        <header className={cn(
-          "sticky top-0 z-50 h-16 flex items-center justify-between px-8 border-b transition-all duration-300",
-          isScrolled
-            ? "border-border/40 bg-background shadow-lg backdrop-blur-xl" 
-            : "border-transparent bg-transparent"
-        )}>
+        <header className="shrink-0 z-50 h-16 flex items-center justify-between px-8 border-b border-border/20 bg-background">
           <div className="flex items-center gap-4">
             {isMobile && (
               <Sheet>
@@ -209,16 +204,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </header>
 
-        {/* Scroll fade - masks content scrolling behind header */}
-        <div className={cn(
-          "sticky top-16 z-40 h-6 -mb-6 pointer-events-none transition-opacity duration-300 bg-gradient-to-b from-background to-transparent",
-          isScrolled ? "opacity-100" : "opacity-0"
-        )} />
-
-        {/* Page Content */}
+        {/* Page Content - only this area scrolls */}
         <div
           className="page-content-scroll p-8 md:p-10 flex-1 animate-glass-in overflow-x-hidden overflow-y-auto"
-          onScroll={(e) => setIsScrolled((e.currentTarget.scrollTop ?? 0) > 20)}
         >
           <div className="max-w-7xl mx-auto space-y-10 pb-16">
             {children}
