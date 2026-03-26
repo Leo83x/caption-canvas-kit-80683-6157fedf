@@ -103,7 +103,7 @@ Deno.serve(async (req) => {
     }
 
     // --- Original OAuth Flow ---
-    const redirectUri = "https://studio.convertamais.online/instagram";
+    const redirectUri = body.redirectUri || "https://studio.convertamais.online/instagram";
     console.log("Receiving OAuth flow for code:", code?.substring(0, 10) + "...");
 
     const authHeader = req.headers.get("Authorization");
