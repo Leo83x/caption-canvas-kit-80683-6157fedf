@@ -114,7 +114,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <header className={cn(
           "sticky top-0 z-50 h-16 flex items-center justify-between px-8 border-b transition-all duration-300",
           isScrolled
-            ? "border-border/40 bg-background/95 shadow-lg backdrop-blur-sm" 
+            ? "border-border/40 bg-background shadow-lg backdrop-blur-xl" 
             : "border-transparent bg-transparent"
         )}>
           <div className="flex items-center gap-4">
