@@ -114,8 +114,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <header className={cn(
           "sticky top-0 z-50 h-16 flex items-center justify-between px-8 border-b transition-all duration-300",
           isScrolled
-            ? "border-white/10 bg-background/95 backdrop-blur-xl shadow-lg ring-1 ring-white/10" 
-            : "border-transparent bg-transparent backdrop-blur-none"
+            ? "border-border/40 bg-background/95 shadow-lg backdrop-blur-sm" 
+            : "border-transparent bg-transparent"
         )}>
           <div className="flex items-center gap-4">
             {isMobile && (
@@ -208,6 +208,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
           </div>
         </header>
+
+        {/* Scroll fade - masks content scrolling behind header */}
+        <div className={cn(
+          "sticky top-16 z-40 h-6 -mb-6 pointer-events-none transition-opacity duration-300 bg-gradient-to-b from-background to-transparent",
+          isScrolled ? "opacity-100" : "opacity-0"
+        )} />
 
         {/* Page Content */}
         <div

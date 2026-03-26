@@ -97,6 +97,7 @@ export type Database = {
           created_at: string
           cta: string | null
           hashtags: string[]
+          headline_text: string | null
           id: string
           image_prompt: string
           image_url: string | null
@@ -105,13 +106,18 @@ export type Database = {
           rationale: string | null
           requires_review: boolean | null
           review_reason: string | null
+          slides: Json | null
+          source_url: string | null
           status: string | null
           style: string | null
+          success_analysis: string | null
+          success_score: number | null
           theme: string
           tone: string | null
           updated_at: string
           user_id: string
           variant: string
+          video_script: Json | null
         }
         Insert: {
           alt_text?: string | null
@@ -120,6 +126,7 @@ export type Database = {
           created_at?: string
           cta?: string | null
           hashtags: string[]
+          headline_text?: string | null
           id?: string
           image_prompt: string
           image_url?: string | null
@@ -128,13 +135,18 @@ export type Database = {
           rationale?: string | null
           requires_review?: boolean | null
           review_reason?: string | null
+          slides?: Json | null
+          source_url?: string | null
           status?: string | null
           style?: string | null
+          success_analysis?: string | null
+          success_score?: number | null
           theme: string
           tone?: string | null
           updated_at?: string
           user_id: string
           variant: string
+          video_script?: Json | null
         }
         Update: {
           alt_text?: string | null
@@ -143,6 +155,7 @@ export type Database = {
           created_at?: string
           cta?: string | null
           hashtags?: string[]
+          headline_text?: string | null
           id?: string
           image_prompt?: string
           image_url?: string | null
@@ -151,13 +164,18 @@ export type Database = {
           rationale?: string | null
           requires_review?: boolean | null
           review_reason?: string | null
+          slides?: Json | null
+          source_url?: string | null
           status?: string | null
           style?: string | null
+          success_analysis?: string | null
+          success_score?: number | null
           theme?: string
           tone?: string | null
           updated_at?: string
           user_id?: string
           variant?: string
+          video_script?: Json | null
         }
         Relationships: [
           {
