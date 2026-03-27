@@ -55,7 +55,7 @@ export default function ThemeSuggestions() {
       if (!user) return;
 
       const { data, error } = await supabase
-        .from("theme_suggestions" as any)
+        .from("theme_suggestions")
         .select("*")
         .eq("user_id", user.id)
         .eq("is_active", true)
