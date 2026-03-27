@@ -20,12 +20,14 @@ export type Database = {
           ai_credits_remaining: number | null
           ai_credits_total: number | null
           bio: string | null
+          body_font: string | null
           brand_colors: string[] | null
           category: string | null
           company_name: string
           created_at: string
           default_tone: string | null
           description: string | null
+          heading_font: string | null
           id: string
           instagram_access_token: string | null
           instagram_handle: string | null
@@ -44,12 +46,14 @@ export type Database = {
           ai_credits_remaining?: number | null
           ai_credits_total?: number | null
           bio?: string | null
+          body_font?: string | null
           brand_colors?: string[] | null
           category?: string | null
           company_name: string
           created_at?: string
           default_tone?: string | null
           description?: string | null
+          heading_font?: string | null
           id?: string
           instagram_access_token?: string | null
           instagram_handle?: string | null
@@ -68,12 +72,14 @@ export type Database = {
           ai_credits_remaining?: number | null
           ai_credits_total?: number | null
           bio?: string | null
+          body_font?: string | null
           brand_colors?: string[] | null
           category?: string | null
           company_name?: string
           created_at?: string
           default_tone?: string | null
           description?: string | null
+          heading_font?: string | null
           id?: string
           instagram_access_token?: string | null
           instagram_handle?: string | null

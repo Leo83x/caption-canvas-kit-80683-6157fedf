@@ -111,7 +111,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         )}
       >
         {/* Top Navbar */}
-        <header className="shrink-0 z-50 h-16 flex items-center justify-between px-8 border-b border-border/20 bg-background">
+        <header className="shrink-0 z-50 h-16 flex items-center justify-between px-8 border-b border-border/20" style={{ backgroundColor: '#f2effd00' }}>
           <div className="flex items-center gap-4">
             {isMobile && (
               <Sheet>
