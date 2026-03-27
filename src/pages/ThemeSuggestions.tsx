@@ -101,8 +101,15 @@ export default function ThemeSuggestions() {
       if (!user) return;
 
       const { error } = await supabase
-        .from("theme_suggestions" as any)
-        .insert([{ ...theme, user_id: user.id }] as any);
+        .from("theme_suggestions")
+        .insert([{
+          theme_name: theme.theme_name,
+          description: theme.description,
+          category: theme.category,
+          frequency: theme.frequency,
+          suggested_hashtags: theme.suggested_hashtags,
+          user_id: user.id,
+        }] as any);
 
       if (error) throw error;
 
