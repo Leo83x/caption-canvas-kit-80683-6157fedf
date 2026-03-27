@@ -42,7 +42,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: 'system', content: `Você é um especialista em marketing de conteúdo e estratégia de redes sociais. Sugira 5 temas de conteúdo estratégicos.` },
+          { role: 'system', content: `Você é um especialista em marketing de conteúdo e estratégia de redes sociais para 2026. Sugira 5 temas de conteúdo estratégicos e atuais. IMPORTANTE: Todas as sugestões devem ser relevantes para o ano de 2026, usando tendências e dados atuais. Nunca mencione anos anteriores como 2024 ou 2025.` },
           { role: 'user', content: `Empresa: ${profile.company_name}\nCategoria: ${profile.category || 'N/A'}\nBio: ${profile.bio || 'N/A'}\nTom: ${profile.default_tone || 'professional'}\nPúblico: ${profile.target_audience || 'N/A'}\nKeywords: ${profile.keywords?.join(', ') || 'N/A'}\n\nGere 5 temas personalizados.` }
         ],
         tools: [{

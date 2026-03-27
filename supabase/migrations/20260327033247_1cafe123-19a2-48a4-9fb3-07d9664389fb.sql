@@ -1,0 +1,2 @@
+ALTER TABLE public.theme_suggestions ADD COLUMN IF NOT EXISTS frequency text DEFAULT 'weekly';
+ALTER TABLE public.theme_suggestions ADD COLUMN IF NOT EXISTS suggested_hashtags text[] DEFAULT '{}'::text[];

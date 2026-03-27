@@ -385,8 +385,10 @@ export type Database = {
           category: string | null
           created_at: string
           description: string | null
+          frequency: string | null
           id: string
           is_active: boolean | null
+          suggested_hashtags: string[] | null
           theme_name: string
           user_id: string
         }
@@ -394,8 +396,10 @@ export type Database = {
           category?: string | null
           created_at?: string
           description?: string | null
+          frequency?: string | null
           id?: string
           is_active?: boolean | null
+          suggested_hashtags?: string[] | null
           theme_name: string
           user_id: string
         }
@@ -403,8 +407,10 @@ export type Database = {
           category?: string | null
           created_at?: string
           description?: string | null
+          frequency?: string | null
           id?: string
           is_active?: boolean | null
+          suggested_hashtags?: string[] | null
           theme_name?: string
           user_id?: string
         }
