@@ -25,6 +25,30 @@ const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Check if user has a profile (onboarding)
+  useEffect(() => {
+    const checkProfile = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data } = await supabase
+          .from("company_profiles")
+          .select("id")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (!data) {
+          setOnboardingUserId(user.id);
+          setShowOnboarding(true);
+        }
+      } catch (err) {
+        console.error("Onboarding check error:", err);
+      } finally {
+        setCheckingProfile(false);
+      }
+    };
+    checkProfile();
+  }, []);
+
   useEffect(() => {
     if (location.state?.editPost) {
       const editPost = location.state.editPost;
