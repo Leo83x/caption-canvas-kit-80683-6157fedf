@@ -18,6 +18,9 @@ const Index = () => {
   const [composingLogos, setComposingLogos] = useState(false);
   const [trendTopic, setTrendTopic] = useState<{ text: string; id: number } | undefined>(undefined);
   const [isGenerationModalOpen, setIsGenerationModalOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingUserId, setOnboardingUserId] = useState<string | null>(null);
+  const [checkingProfile, setCheckingProfile] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
