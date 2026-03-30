@@ -12,6 +12,7 @@ import type { GeneratedPost, PostVariation } from "@/types";
 import { composeLogoOnImage, uploadComposedImage } from "@/utils/imageComposition";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { OnboardingWizard } from "@/components/OnboardingWizard";
 
 const Index = () => {
   const [generatedPost, setGeneratedPost] = useState<GeneratedPost | null>(null);
