@@ -1,23 +1,17 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { 
-  Instagram, 
   Settings as SettingsIcon, 
   LogOut, 
   BookmarkCheck, 
-  Link2, 
   BarChart3, 
   Lightbulb, 
-  CreditCard, 
   Image, 
   CalendarDays, 
-  Trophy, 
   MessageSquare,
   Search,
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  LayoutDashboard,
-  Hash
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
