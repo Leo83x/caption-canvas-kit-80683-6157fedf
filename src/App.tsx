@@ -30,7 +30,7 @@ const Terms = lazy(() => import("./pages/Terms"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Demo = lazy(() => import("./pages/Demo"));
 const PublicApproval = lazy(() => import("./pages/PublicApproval"));
-import Benchmarking from "./pages/Benchmarking";
+const Benchmarking = lazy(() => import("./pages/Benchmarking"));
 
 const queryClient = new QueryClient({
   defaultOptions: {

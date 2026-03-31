@@ -163,6 +163,15 @@ const Index = () => {
 
   return (
     <>
+      {showOnboarding && onboardingUserId && (
+        <OnboardingWizard
+          userId={onboardingUserId}
+          onComplete={() => {
+            setShowOnboarding(false);
+            window.location.reload();
+          }}
+        />
+      )}
       <GenerationModal 
         isOpen={isGenerationModalOpen} 
         onClose={() => setIsGenerationModalOpen(false)} 
