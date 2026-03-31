@@ -27,6 +27,7 @@ export type Database = {
           created_at: string
           default_tone: string | null
           description: string | null
+          facebook_page_id: string | null
           heading_font: string | null
           id: string
           instagram_access_token: string | null
@@ -53,6 +54,7 @@ export type Database = {
           created_at?: string
           default_tone?: string | null
           description?: string | null
+          facebook_page_id?: string | null
           heading_font?: string | null
           id?: string
           instagram_access_token?: string | null
@@ -79,6 +81,7 @@ export type Database = {
           created_at?: string
           default_tone?: string | null
           description?: string | null
+          facebook_page_id?: string | null
           heading_font?: string | null
           id?: string
           instagram_access_token?: string | null
