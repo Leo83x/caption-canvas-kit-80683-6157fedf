@@ -119,11 +119,12 @@ const App = () => {
                   <Route path="/themes" element={<ThemeSuggestions />} />
                   <Route path="/images" element={<ImageLibrary />} />
                   <Route path="/subscription" element={<Subscription />} />
-                  <Route path="/engagement" element={<Engagement />} />
+                  <Route path="/engagement" element={<ReadyReplies />} />
                   <Route path="/schedule" element={<Schedule />} />
                   <Route path="/leads" element={<LeadHunter />} />
-                  <Route path="/hashtags" element={<HashtagExplorer />} />
-                  <Route path="/benchmarking" element={<Benchmarking />} />
+                  <Route path="/research" element={<Research />} />
+                  <Route path="/hashtags" element={<Research />} />
+                  <Route path="/benchmarking" element={<Research />} />
                 </Route>
 
                 <Route path="/privacy" element={<Privacy />} />

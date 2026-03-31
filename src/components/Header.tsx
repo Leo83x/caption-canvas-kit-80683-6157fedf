@@ -36,10 +36,10 @@ export function Header() {
     { to: "/posts", label: "Meus Posts", icon: BookmarkCheck },
     { to: "/schedule", label: "Agendamentos", icon: CalendarDays },
     { to: "/analytics", label: "Desempenho", icon: BarChart3 },
-    { to: "/themes", label: "Temas de Conteúdo", icon: Lightbulb },
+    { to: "/themes", label: "Temas", icon: Lightbulb },
     { to: "/images", label: "Biblioteca", icon: Image },
-    { to: "/benchmarking", label: "Benchmarking", icon: Trophy },
-    { to: "/engagement", label: "Engajamento", icon: MessageSquare },
+    { to: "/research", label: "Pesquisa", icon: Trophy },
+    { to: "/engagement", label: "Respostas", icon: MessageSquare },
   ];
 
   const accountMenuItems = [
