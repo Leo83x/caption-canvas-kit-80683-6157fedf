@@ -1,23 +1,17 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { 
-  Instagram, 
   Settings as SettingsIcon, 
   LogOut, 
   BookmarkCheck, 
-  Link2, 
   BarChart3, 
   Lightbulb, 
-  CreditCard, 
   Image, 
   CalendarDays, 
-  Trophy, 
   MessageSquare,
   Search,
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  LayoutDashboard,
-  Hash
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -45,16 +39,15 @@ const NAV_GROUPS = [
     items: [
       { to: "/posts", label: "Meus Posts", icon: BookmarkCheck },
       { to: "/schedule", label: "Agendamentos", icon: CalendarDays },
-      { to: "/engagement", label: "Engajamento", icon: MessageSquare },
+      { to: "/engagement", label: "Respostas Prontas", icon: MessageSquare },
     ]
   },
   {
     label: "Crescimento",
     items: [
-      { to: "/benchmarking", label: "Benchmarking", icon: Trophy },
+      { to: "/research", label: "Pesquisa & Tendências", icon: Search },
       { to: "/analytics", label: "Desempenho", icon: BarChart3 },
       { to: "/leads", label: "Caçador de Leads", icon: Search, badge: "Novo" },
-      { to: "/hashtags", label: "Hashtags", icon: Hash },
     ]
   }
 ];

@@ -12,14 +12,42 @@ import type { GeneratedPost, PostVariation } from "@/types";
 import { composeLogoOnImage, uploadComposedImage } from "@/utils/imageComposition";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { OnboardingWizard } from "@/components/OnboardingWizard";
 
 const Index = () => {
   const [generatedPost, setGeneratedPost] = useState<GeneratedPost | null>(null);
   const [composingLogos, setComposingLogos] = useState(false);
   const [trendTopic, setTrendTopic] = useState<{ text: string; id: number } | undefined>(undefined);
   const [isGenerationModalOpen, setIsGenerationModalOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingUserId, setOnboardingUserId] = useState<string | null>(null);
+  const [checkingProfile, setCheckingProfile] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Check if user has a profile (onboarding)
+  useEffect(() => {
+    const checkProfile = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data } = await supabase
+          .from("company_profiles")
+          .select("id")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (!data) {
+          setOnboardingUserId(user.id);
+          setShowOnboarding(true);
+        }
+      } catch (err) {
+        console.error("Onboarding check error:", err);
+      } finally {
+        setCheckingProfile(false);
+      }
+    };
+    checkProfile();
+  }, []);
 
   useEffect(() => {
     if (location.state?.editPost) {
@@ -135,6 +163,15 @@ const Index = () => {
 
   return (
     <>
+      {showOnboarding && onboardingUserId && (
+        <OnboardingWizard
+          userId={onboardingUserId}
+          onComplete={() => {
+            setShowOnboarding(false);
+            window.location.reload();
+          }}
+        />
+      )}
       <GenerationModal 
         isOpen={isGenerationModalOpen} 
         onClose={() => setIsGenerationModalOpen(false)} 

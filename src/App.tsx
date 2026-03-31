@@ -21,16 +21,16 @@ const ThemeSuggestions = lazy(() => import("./pages/ThemeSuggestions"));
 const ImageLibrary = lazy(() => import("./pages/ImageLibrary"));
 const Subscription = lazy(() => import("./pages/Subscription"));
 const Schedule = lazy(() => import("./pages/Schedule"));
-const Engagement = lazy(() => import("./pages/Engagement"));
+const ReadyReplies = lazy(() => import("./pages/ReadyReplies"));
 const LeadHunter = lazy(() => import("./pages/LeadHunter"));
-const HashtagExplorer = lazy(() => import("./pages/HashtagExplorer"));
+const Research = lazy(() => import("./pages/Research"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Demo = lazy(() => import("./pages/Demo"));
 const PublicApproval = lazy(() => import("./pages/PublicApproval"));
-import Benchmarking from "./pages/Benchmarking";
+const Benchmarking = lazy(() => import("./pages/Benchmarking"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -119,11 +119,12 @@ const App = () => {
                   <Route path="/themes" element={<ThemeSuggestions />} />
                   <Route path="/images" element={<ImageLibrary />} />
                   <Route path="/subscription" element={<Subscription />} />
-                  <Route path="/engagement" element={<Engagement />} />
+                  <Route path="/engagement" element={<ReadyReplies />} />
                   <Route path="/schedule" element={<Schedule />} />
                   <Route path="/leads" element={<LeadHunter />} />
-                  <Route path="/hashtags" element={<HashtagExplorer />} />
-                  <Route path="/benchmarking" element={<Benchmarking />} />
+                  <Route path="/research" element={<Research />} />
+                  <Route path="/hashtags" element={<Research />} />
+                  <Route path="/benchmarking" element={<Research />} />
                 </Route>
 
                 <Route path="/privacy" element={<Privacy />} />
