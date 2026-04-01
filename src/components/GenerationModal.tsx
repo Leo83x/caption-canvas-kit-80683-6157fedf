@@ -115,8 +115,8 @@ export function GenerationModal({ isOpen, onClose }: GenerationModalProps) {
 
             <div className="pt-4 border-t border-border/50">
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground opacity-70">
-                <Brain className="h-3 w-3" />
-                <span>Powered by Groq LPU™ Engine</span>
+                <Sparkles className="h-3 w-3" />
+                <span>Powered by Studio Genius AI</span>
               </div>
             </div>
           </div>

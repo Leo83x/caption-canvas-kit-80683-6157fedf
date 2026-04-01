@@ -129,7 +129,6 @@ export default function SavedPosts() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Check if Instagram is connected
       const { data: profile } = await supabase
         .from("company_profiles")
         .select("instagram_access_token")
@@ -142,7 +141,6 @@ export default function SavedPosts() {
         return;
       }
 
-      // Create a temporary scheduled post
       const { data: scheduledPost, error: insertError } = await supabase
         .from("scheduled_posts")
         .insert({
@@ -157,23 +155,39 @@ export default function SavedPosts() {
 
       if (insertError) throw insertError;
 
-      toastId = toast.loading("Publishing to Instagram...");
+      toastId = toast.loading("Publicando no Instagram...");
 
-      const { data, error } = await supabase.functions.invoke("publish-instagram", {
-        body: { scheduledPostId: scheduledPost.id },
-      });
+      // Retry logic - up to 3 attempts
+      let lastError: Error | null = null;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const { data, error } = await supabase.functions.invoke("publish-instagram", {
+            body: { scheduledPostId: scheduledPost.id },
+          });
 
-      if (error) throw error;
+          if (error) throw error;
 
-      if (data.success) {
-        toast.success("Post published successfully to Instagram!", { id: toastId });
-        loadPosts();
-      } else {
-        throw new Error(data.error || "Error publishing");
+          if (data.success) {
+            toast.success("Post publicado com sucesso no Instagram!", { id: toastId });
+            loadPosts();
+            return;
+          } else {
+            throw new Error(data.error || "Erro ao publicar");
+          }
+        } catch (e: any) {
+          lastError = e;
+          console.warn(`Publish attempt ${attempt}/3 failed:`, e.message);
+          if (attempt < 3) {
+            toast.loading(`Tentativa ${attempt + 1}/3...`, { id: toastId });
+            await new Promise(r => setTimeout(r, 2000 * attempt));
+          }
+        }
       }
+
+      throw lastError || new Error("Falha após 3 tentativas");
     } catch (error: any) {
       console.error("Error publishing:", error);
-      const errorMessage = error.message || "Error publishing to Instagram";
+      const errorMessage = error.message || "Erro ao publicar no Instagram";
       if (toastId) {
         toast.error(errorMessage, { id: toastId });
       } else {
