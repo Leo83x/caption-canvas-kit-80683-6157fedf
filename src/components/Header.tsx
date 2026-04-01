@@ -1,4 +1,4 @@
-import { Instagram, Settings as SettingsIcon, LogOut, BookmarkCheck, Link2, BarChart3, Lightbulb, CreditCard, Menu, User, Image, CalendarDays, Trophy, MessageSquare } from "lucide-react";
+import { Instagram, Settings as SettingsIcon, LogOut, BookmarkCheck, Link2, BarChart3, Lightbulb, CreditCard, Menu, User, Image, CalendarDays, Trophy, MessageSquare, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,8 @@ import { ThemeToggle } from "./ThemeToggle";
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { SearchCommandPalette } from "./SearchCommandPalette";
+import { NotificationBell } from "./NotificationBell";
 
 export function Header() {
   const navigate = useNavigate();
