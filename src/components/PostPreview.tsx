@@ -348,7 +348,7 @@ STRATEGY: ${currentPost.rationale}
         status: "draft",
         slides: (currentPost.slides || []) as any,
         source_url: currentPost.sourceUrl,
-        success_score: currentPost.successScore,
+        success_score: currentPost.successScore ? Math.round(currentPost.successScore) : null,
         success_analysis: currentPost.successAnalysis,
         headline_text: currentPost.headlineText,
         video_script: (currentPost.videoScript || null) as any
