@@ -171,7 +171,7 @@ export default function ImageLibrary() {
         <div className="space-y-2 relative z-10">
           <h1 className="text-2xl md:text-3xl font-black text-foreground/90 tracking-tighter italic-fix uppercase flex items-center gap-3">
             <span className="bg-gradient-to-r from-primary via-accent to-pink-500 bg-clip-text text-transparent">Acervo</span>
-            <span className="text-foreground/20">Visual</span>
+            <span className="text-hero-muted">Visual</span>
           </h1>
           <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-[0.2em] italic">
             Ativos estratégicos para composições de alto impacto

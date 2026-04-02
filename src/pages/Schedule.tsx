@@ -7,7 +7,7 @@ export default function Schedule() {
       <div className="flex flex-col gap-2 mb-4">
         <h1 className="text-2xl md:text-3xl font-black text-foreground/90 tracking-tighter italic-fix uppercase flex items-center gap-3">
           <span className="bg-gradient-to-r from-primary via-accent to-pink-500 bg-clip-text text-transparent">Agendamentos</span>
-          <span className="text-foreground/20">de Elite</span>
+          <span className="text-hero-muted">de Elite</span>
         </h1>
         <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-[0.2em] italic">Visualize e organize sua trajetória de autoridade no tempo</p>
       </div>

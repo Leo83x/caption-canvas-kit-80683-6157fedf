@@ -132,7 +132,7 @@ export default function Analytics() {
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl md:text-3xl font-black text-foreground/90 tracking-tighter italic-fix uppercase flex items-center gap-3">
             <span className="bg-gradient-to-r from-primary via-accent to-pink-500 bg-clip-text text-transparent">Desempenho</span>
-            <span className="text-foreground/20">Pro</span>
+            <span className="text-hero-muted">Pro</span>
           </h1>
           <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-[0.2em] italic">
             Análise detalhada, previsões estratégicas e sentimento do público

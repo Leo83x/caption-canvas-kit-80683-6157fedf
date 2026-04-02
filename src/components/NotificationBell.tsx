@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -21,59 +21,101 @@ export function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    loadNotifications();
-  }, []);
-
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Check for recently published posts
-    const { data: published } = await supabase
+    const { data: scheduledUpdates, error } = await supabase
       .from("scheduled_posts")
-      .select("*, generated_posts(caption)")
+      .select("id, generated_post_id, error_message, published_at, updated_at, status")
       .eq("user_id", user.id)
-      .eq("status", "published")
-      .order("published_at", { ascending: false })
-      .limit(5);
-
-    // Check for failed posts
-    const { data: failed } = await supabase
-      .from("scheduled_posts")
-      .select("*, generated_posts(caption)")
-      .eq("user_id", user.id)
-      .eq("status", "failed")
+      .in("status", ["published", "failed"])
       .order("updated_at", { ascending: false })
-      .limit(5);
+      .limit(10);
 
-    const notifs: Notification[] = [];
+    if (error || !scheduledUpdates) {
+      console.error("Error loading notifications:", error);
+      setNotifications([]);
+      return;
+    }
 
-    published?.forEach((p) => {
-      notifs.push({
-        id: `pub-${p.id}`,
-        title: "Post publicado ✅",
-        message: (p.generated_posts as any)?.caption?.substring(0, 60) + "..." || "Post publicado com sucesso",
-        time: new Date(p.published_at || p.updated_at),
-        read: false,
-        link: "/analytics",
+    const generatedPostIds = Array.from(
+      new Set(
+        scheduledUpdates
+          .map((item) => item.generated_post_id)
+          .filter((value): value is string => Boolean(value))
+      )
+    );
+
+    const captionsByPostId = new Map<string, string>();
+
+    if (generatedPostIds.length > 0) {
+      const { data: posts } = await supabase
+        .from("generated_posts")
+        .select("id, caption")
+        .in("id", generatedPostIds);
+
+      posts?.forEach((post) => {
+        captionsByPostId.set(post.id, post.caption);
       });
+    }
+
+    const notifs: Notification[] = scheduledUpdates.map((item) => {
+      const caption = item.generated_post_id
+        ? captionsByPostId.get(item.generated_post_id)
+        : undefined;
+
+      return {
+        id: `${item.status}-${item.id}`,
+        title: item.status === "published" ? "Post publicado ✅" : "Falha na publicação ❌",
+        message:
+          item.status === "published"
+            ? caption?.substring(0, 60)
+              ? `${caption.substring(0, 60)}...`
+              : "Post publicado com sucesso"
+            : item.error_message?.substring(0, 80) || "Erro ao publicar",
+        time: new Date(item.published_at || item.updated_at),
+        read: false,
+        link: item.status === "published" ? "/analytics" : "/schedule",
+      };
     });
 
-    failed?.forEach((p) => {
-      notifs.push({
-        id: `fail-${p.id}`,
-        title: "Falha na publicação ❌",
-        message: p.error_message?.substring(0, 60) || "Erro ao publicar",
-        time: new Date(p.updated_at),
-        read: false,
-        link: "/schedule",
-      });
-    });
-
-    notifs.sort((a, b) => b.time.getTime() - a.time.getTime());
     setNotifications(notifs.slice(0, 10));
-  };
+  }, []);
+
+  useEffect(() => {
+    loadNotifications();
+
+    let channelCleanup = () => {};
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+
+      const channel = supabase
+        .channel(`scheduled-post-notifications-${user.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "scheduled_posts",
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => {
+            loadNotifications();
+          }
+        )
+        .subscribe();
+
+      channelCleanup = () => {
+        supabase.removeChannel(channel);
+      };
+    });
+
+    return () => {
+      channelCleanup();
+    };
+  }, [loadNotifications]);
 
   const unreadCount = notifications.length;
 

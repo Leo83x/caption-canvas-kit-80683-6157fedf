@@ -18,6 +18,7 @@ const pages = [
   { label: "Temas", to: "/themes", icon: Lightbulb },
   { label: "Biblioteca de Imagens", to: "/images", icon: Image },
   { label: "Pesquisa & Benchmarking", to: "/research", icon: Trophy },
+  { label: "Caçador de Leads", to: "/leads", icon: Instagram },
   { label: "Respostas Inteligentes", to: "/engagement", icon: MessageSquare },
   { label: "Integração Instagram", to: "/instagram", icon: Link2 },
   { label: "Planos e Assinatura", to: "/subscription", icon: CreditCard },
