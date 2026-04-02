@@ -5,6 +5,52 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const DEFAULT_TIMEZONE = "America/Sao_Paulo";
+
+const normalizeTime = (value: string | null | undefined) => {
+  const [hours = "00", minutes = "00", seconds = "00"] = (value ?? "").split(":");
+  return `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}:${seconds.padStart(2, "0")}`;
+};
+
+const getCurrentDateTimeInTimezone = (date: Date, timeZone: string) => {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+
+  const lookup = Object.fromEntries(
+    parts
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value])
+  );
+
+  return {
+    date: `${lookup.year}-${lookup.month}-${lookup.day}`,
+    time: `${lookup.hour}:${lookup.minute}:${lookup.second}`,
+  };
+};
+
+const isPostDue = (
+  scheduledDate: string,
+  scheduledTime: string,
+  timeZone: string | null | undefined,
+  now: Date
+) => {
+  const current = getCurrentDateTimeInTimezone(now, timeZone || DEFAULT_TIMEZONE);
+  const normalizedScheduledTime = normalizeTime(scheduledTime);
+
+  return (
+    scheduledDate < current.date ||
+    (scheduledDate === current.date && normalizedScheduledTime <= current.time)
+  );
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -18,25 +64,32 @@ Deno.serve(async (req) => {
     );
 
     const now = new Date();
-    const currentDate = now.toISOString().split("T")[0]; // YYYY-MM-DD
-    const currentTime = now.toTimeString().substring(0, 5); // HH:MM
+    console.log(`Checking scheduled posts for ${now.toISOString()}`);
 
-    console.log(`Checking scheduled posts for ${currentDate} at ${currentTime}`);
-
-    // Find posts that are due (scheduled_date <= today AND scheduled_time <= now AND status = pending)
-    const { data: duePosts, error: queryError } = await supabaseAdmin
+    const { data: scheduledPosts, error: queryError } = await supabaseAdmin
       .from("scheduled_posts")
       .select("*, generated_posts(*)")
-      .eq("status", "pending")
-      .lte("scheduled_date", currentDate)
-      .lte("scheduled_time", currentTime);
+      .in("status", ["scheduled", "pending"])
+      .order("scheduled_date", { ascending: true })
+      .order("scheduled_time", { ascending: true });
 
     if (queryError) {
       console.error("Error querying scheduled posts:", queryError);
       throw queryError;
     }
 
-    console.log(`Found ${duePosts?.length || 0} posts due for publishing`);
+    const duePosts = (scheduledPosts || []).filter((scheduledPost) =>
+      isPostDue(
+        scheduledPost.scheduled_date,
+        scheduledPost.scheduled_time,
+        scheduledPost.timezone,
+        now
+      )
+    );
+
+    console.log(
+      `Found ${duePosts.length} posts due for publishing out of ${scheduledPosts?.length || 0} scheduled posts`
+    );
 
     const results = [];
 

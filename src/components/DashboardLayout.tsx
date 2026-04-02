@@ -1,11 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "./Sidebar";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { 
   Menu, 
   User, 
-  Bell, 
   Search as SearchIcon, 
   Settings as SettingsIcon, 
   Link2, 
@@ -18,6 +17,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "./ThemeToggle";
+import { SearchCommandPalette } from "./SearchCommandPalette";
+import { NotificationBell } from "./NotificationBell";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -33,10 +34,9 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const mainRef = useRef<HTMLElement>(null);
 
   const handleSignOut = async () => {
     try {
@@ -52,26 +52,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024);
     };
+
     checkMobile();
     window.addEventListener("resize", checkMobile);
 
-    const scrollContainer = mainRef.current?.querySelector(".page-content-scroll");
-    
-    const handleScrollManual = () => {
-      if (scrollContainer) {
-        setIsScrolled(scrollContainer.scrollTop > 20);
-      }
-    };
-
-    if (scrollContainer) {
-      scrollContainer.addEventListener("scroll", handleScrollManual, { passive: true });
-    }
-
     return () => {
       window.removeEventListener("resize", checkMobile);
-      if (scrollContainer) {
-        scrollContainer.removeEventListener("scroll", handleScrollManual);
-      }
     };
   }, []);
 
@@ -104,7 +90,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main Content Area */}
       <main 
-        ref={mainRef}
         className={cn(
           "flex-1 flex flex-col min-w-0 h-screen overflow-hidden transition-all duration-300 ease-in-out",
           !isMobile && (isSidebarCollapsed ? "ml-16" : "ml-64")
@@ -133,20 +118,31 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center px-4 py-2 bg-white/40 dark:bg-black/20 backdrop-blur-md border border-white/40 dark:border-white/10 rounded-full text-xs text-muted-foreground/80 gap-3 group hover:border-primary/30 transition-all shadow-sm">
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className="hidden md:flex items-center px-4 py-2 bg-white/40 dark:bg-black/20 backdrop-blur-md border border-white/40 dark:border-white/10 rounded-full text-xs text-muted-foreground/80 gap-3 group hover:border-primary/30 transition-all shadow-sm"
+            >
               <SearchIcon className="h-3.5 w-3.5 group-hover:text-primary transition-colors" />
               <span className="font-medium">Buscar recursos...</span>
               <div className="flex items-center gap-1 opacity-40">
                 <span className="text-[10px] font-bold">⌘</span>
                 <span className="text-[10px] font-bold">K</span>
               </div>
-            </div>
+            </button>
 
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="rounded-full relative text-foreground/70 hover:bg-white/40">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-2.5 right-2.5 h-1.5 w-1.5 bg-primary rounded-full ring-2 ring-white/50" />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full text-foreground/70 hover:bg-white/40 md:hidden"
+                onClick={() => setSearchOpen(true)}
+              >
+                <SearchIcon className="h-5 w-5" />
               </Button>
+
+              <SearchCommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
+              <NotificationBell />
 
               <ThemeToggle />
 

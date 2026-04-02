@@ -24,7 +24,8 @@ All colors MUST be HSL.
     --secondary-foreground: 240 8% 12%;
 
     --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
+    --muted-foreground: 240 4% 40%;
+    --hero-muted: 240 7% 34%;
 
     --accent: 320 85% 60%;
     --accent-foreground: 0 0% 100%;
@@ -79,7 +80,8 @@ All colors MUST be HSL.
     --secondary-foreground: 240 5% 96%;
 
     --muted: 240 6% 16%;
-    --muted-foreground: 240 5% 65%;
+    --muted-foreground: 240 5% 74%;
+    --hero-muted: 240 6% 72%;
 
     --accent: 320 85% 60%;
     --accent-foreground: 0 0% 100%;
@@ -144,6 +146,10 @@ All colors MUST be HSL.
 
   .transition-smooth {
     transition: var(--transition-smooth);
+  }
+
+  .text-hero-muted {
+    color: hsl(var(--hero-muted));
   }
 
   .glass {

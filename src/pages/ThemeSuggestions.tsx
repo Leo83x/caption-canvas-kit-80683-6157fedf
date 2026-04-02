@@ -155,7 +155,7 @@ export default function ThemeSuggestions() {
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl md:text-3xl font-black text-foreground/90 tracking-tighter italic-fix uppercase flex items-center gap-3">
             <span className="bg-gradient-to-r from-primary via-accent to-pink-500 bg-clip-text text-transparent">Temas</span>
-            <span className="text-foreground/20">Estratégicos</span>
+            <span className="text-hero-muted">Estratégicos</span>
           </h1>
           <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-[0.2em] italic">
             Descubra o que postar hoje com base no seu perfil e tendências

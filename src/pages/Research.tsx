@@ -22,7 +22,7 @@ export default function Research() {
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl md:text-3xl font-black text-foreground/90 tracking-tighter uppercase flex items-center gap-3">
           <span className="bg-gradient-to-r from-primary via-accent to-pink-500 bg-clip-text text-transparent">Pesquisa</span>
-          <span className="text-foreground/20">& Tendências</span>
+          <span className="text-hero-muted">& Tendências</span>
         </h1>
         <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-[0.2em] italic">
           Hashtags inteligentes e análise competitiva em um só lugar
